@@ -8,7 +8,7 @@ public class Paragraph extends Text{
 	private  ArrayList<Text> links;
 	private String name;
 	private String text;
-	//private SuffixTree suffixTree;
+	private SuffixTree suffixTree;
 
 	protected Paragraph(){}
 
@@ -18,8 +18,31 @@ public class Paragraph extends Text{
 		this.links = links;
 		this.name = name;
 		this.text = text;
+		createSuffixTree();
 	}
 
+	protected void createSuffixTree() {
+		boolean hasText = this.text != null;
+		String suffixSource = "";
+		for (Text source : this.items) {
+			if (source.getClass().getName().equals("Model.Indent")) {
+				suffixSource += " " + ((Indent)source).getText().toLowerCase();
+			}
+			else if (source.getClass().getName().equals("Model.Digit")) {
+				suffixSource += " " + ((Digit)source).getText().toLowerCase();
+			}
+		}
+		suffixSource += "$";
+		if (!hasText) {
+			suffixSource = suffixSource.substring(1);
+		}
+		else {
+			suffixSource = this.text.toLowerCase() + suffixSource;
+		}
+		this.suffixTree = new SuffixTree(suffixSource);
+	}
+
+	public SuffixTree getSuffixTree() { return suffixTree; }
 	public ArrayList<Text> getItems() {
 		return items;
 	}
