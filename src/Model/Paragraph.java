@@ -39,6 +39,9 @@ public class Paragraph extends Text{
 		else {
 			suffixSource = this.text.toLowerCase() + suffixSource;
 		}
+		suffixSource = suffixSource.replace('„', '"');
+		suffixSource = suffixSource.replace('“', '"');
+		suffixSource = suffixSource.replace('–', '-');
 		this.suffixTree = new SuffixTree(suffixSource);
 	}
 
