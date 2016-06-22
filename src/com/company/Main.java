@@ -1,15 +1,18 @@
 package com.company;
 
-import Controller.Downloader;
-import Controller.Parser;
+import Controller.*;
 import Model.*;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args) {
-        ArrayList<String> html = Downloader.downloadHTML("https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10001597");
-        Document document = Parser.parseHTML(html);
+    private final static String url = "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10001597";
 
+    public static void main(String[] args) {
+        Document document = createDocument();
+        System.out.println("[ - The document is ready ...]\n\n");
         ArrayList<Paragraph> paragraphs = new ArrayList<Paragraph>();
         for (Article article : document.getItems()) {
             for (Text text : article.getItems()) {
@@ -24,32 +27,39 @@ public class Main {
                 }
             }
         }
+        paragraphs.remove(paragraphs.size() - 1);
+        Search.getInstance().setParagraphs(paragraphs);
+        menu();
+    }
 
-        /*
+    public static Document createDocument() {
+        System.out.println("[ - Downloading HTML-document ...]");
+        ArrayList<String> html = Downloader.downloadHTML(url);
+        System.out.println("[ - Creating data structure ...]");
+        return Parser.parseHTML(html);
+    }
 
-        for (Paragraph paragraph : paragraphs) {
-            System.out.println("Paragraph " + paragraph.getNumber() + ": " + paragraph.getName());
-            if (paragraph.getText() != null) {
-                System.out.println("Text: " + paragraph.getText());
-                if (paragraph.getItems().size() > 0) {
-                    for (Text text : paragraph.getItems()) {
-                        System.out.println("\t\tZiffer " + ((Digit)text).getNumber() + ": " + ((Digit)text).getText());
-                    }
-                }
+    public static void menu() {
+        while (true) {
+            System.out.print("Please, enter the search string: ");
+            String string = "";
+            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                string = bufferRead.readLine();
             }
-            else {
-                for (Text text : paragraph.getItems()) {
-                    System.out.println("\tAbsatz " + ((Indent)text).getNumber() + ": " + ((Indent)text).getText());
-                    if (((Indent)text).getItems() != null) {
-                        for (Digit digit : ((Indent) text).getItems()) {
-                            System.out.println("\t\tZiffer " + digit.getNumber() + ": " + digit.getText());
-                        }
-                    }
-                }
+            catch (Exception e) {}
+            if (string.length() > 0) {
+                SearchResult result = Search.getInstance().search(string);
+                System.out.println("Found in following paragraphs: ");
+                for (Paragraph paragraph : result.getParagraphs())
+                    if (paragraph != null)
+                        System.out.println(" - Paragraph " + paragraph.getNumber());
             }
-            System.out.println();
+            try {
+                bufferRead.readLine();
+                Runtime.getRuntime().exec("cls");
+            }
+            catch (Exception e) {}
         }
-
-        */
     }
 }

@@ -27,6 +27,9 @@ public class Paragraph extends Text{
 		for (Text source : this.items) {
 			if (source.getClass().getName().equals("Model.Indent")) {
 				suffixSource += " " + ((Indent)source).getText().toLowerCase();
+                if (((Indent)source).getItems() != null)
+                    for (Digit digit : ((Indent)source).getItems())
+                        suffixSource += " " + digit.getText().toLowerCase();
 			}
 			else if (source.getClass().getName().equals("Model.Digit")) {
 				suffixSource += " " + ((Digit)source).getText().toLowerCase();
